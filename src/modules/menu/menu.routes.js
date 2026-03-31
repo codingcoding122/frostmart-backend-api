@@ -3,12 +3,21 @@ import * as menuController from "./menu.controller.js";
 import { authMiddleware } from "../../middleware/auth.middleware.js";
 import { authorizeRoles } from "../../middleware/authorizeRoles.js";
 import upload from "../../middleware/upload.middleware.js";
+import { handleUploadError } from "../../middleware/handleUploadError.js";
 
 const router = Router();
 
 // FOTO (lebih spesifik dulu)
-router.post("/photo/:id", upload.single("image"), menuController.uploadPhoto);
-router.put("/photo/:id", upload.single("image"), menuController.replacePhoto);
+router.post(
+  "/photo/:id",
+  handleUploadError(upload.single("image")),
+  menuController.uploadPhoto,
+);
+router.put(
+  "/photo/:id",
+  handleUploadError(upload.single("image")),
+  menuController.replacePhoto,
+);
 router.delete("/photo/:id", menuController.deletePhoto);
 
 // CREATE

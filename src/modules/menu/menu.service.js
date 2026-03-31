@@ -76,9 +76,6 @@ export const replaceMenuPhoto = async (id, file) => {
 };
 
 export const deleteMenuPhoto = async (id) => {
-  if (!file) {
-    throw new Error("File tidak ditemukan");
-  }
   const menu = await getMenuById(id);
   if (!menu) throw new Error("Menu tidak ditemukan");
 
