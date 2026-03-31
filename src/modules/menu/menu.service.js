@@ -1,7 +1,13 @@
 import { deleteImage, uploadImage } from "../../utils/cloudinary.js";
 import * as menuRepository from "./menu.repository.js";
+import { deleteCache } from "../../utils/cache.js";
+
+const invalidateMenusCache = async (id = null) => {
+  await deleteCache("cache:/api/menus*"); // Hapus semua data di memory
+};
 
 export const createMenu = async (data) => {
+  await invalidateMenusCache();
   return await menuRepository.createMenu(data);
 };
 
@@ -10,7 +16,7 @@ export const updateMenu = async (id, data) => {
   if (!existing) {
     throw new Error("Menu is not found!");
   }
-
+  await invalidateMenusCache();
   return await menuRepository.updateMenu(id, data);
 };
 
@@ -41,6 +47,7 @@ export const deleteMenu = async (id) => {
   }
 
   await menuRepository.deleteMenu(id);
+  await invalidateMenusCache();
 };
 
 export const uploadMenuPhoto = async (id, file) => {
@@ -53,6 +60,9 @@ export const uploadMenuPhoto = async (id, file) => {
   const result = await uploadImage(file.buffer);
 
   await menuRepository.updateMenuImage(id, result.secure_url, result.public_id);
+
+  // INVALIDATE CACHE
+  await invalidateMenusCache();
 
   return result.secure_url;
 };
@@ -72,6 +82,8 @@ export const replaceMenuPhoto = async (id, file) => {
 
   await menuRepository.updateMenuImage(id, result.secure_url, result.public_id);
 
+  // INVALIDATE CACHE
+  await invalidateMenusCache();
   return result.secure_url;
 };
 
@@ -81,4 +93,7 @@ export const deleteMenuPhoto = async (id) => {
 
   await deleteImage(menu.image_path);
   await menuRepository.removeMenuImage(id);
+
+  // INVALIDATE CACHE
+  await invalidateMenusCache();
 };

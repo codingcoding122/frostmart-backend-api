@@ -4,6 +4,7 @@ import { authMiddleware } from "../../middleware/auth.middleware.js";
 import { authorizeRoles } from "../../middleware/authorizeRoles.js";
 import upload from "../../middleware/upload.middleware.js";
 import { handleUploadError } from "../../middleware/handleUploadError.js";
+import { cacheMiddleware } from "../../middleware/cache.middleware.js";
 
 const router = Router();
 
@@ -36,10 +37,18 @@ router.put(
   menuController.updateMenu,
 );
 
+// TANPA CACHE REDIS
 // GET ALL
-router.get("/", menuController.getMenus);
+// router.get("/", menuController.getMenus);
+// GET BY ID
+// router.get("/:id", menuController.getMenuById);
 
-router.get("/:id", menuController.getMenuById);
+// PAKAI CACHE REDIS
+// GET ALL
+router.get("/", cacheMiddleware(60), menuController.getMenus);
+
+// GET BY ID
+router.get("/:id", cacheMiddleware(60), menuController.getMenuById);
 
 // DELETE
 router.delete(
