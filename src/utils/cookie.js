@@ -1,7 +1,7 @@
 export const setCookies = (res, { accessToken, refreshToken }) => {
   res.cookie("access_token", accessToken, {
-    httpOnly: true,
-    secure: true,
+    httpOnly: true, // kalau true tidak diakases oleh frontend atau JS
+    secure: true, // hanya bisa dipakai oleh https bukan http
     sameSite: "lax",
     maxAge: 60 * 60 * 1000,
   });

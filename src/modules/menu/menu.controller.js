@@ -4,6 +4,11 @@ import {
   paginationSchema,
   updateMenuSchema,
 } from "./menu.validation.js";
+import {
+  uploadMenuPhoto,
+  replaceMenuPhoto,
+  deleteMenuPhoto,
+} from "./menu.service.js";
 
 export const createMenu = async (req, res) => {
   try {
@@ -59,6 +64,44 @@ export const deleteMenu = async (req, res) => {
     await menuService.deleteMenu(id);
 
     res.json({ message: "Menu deleted successfully" });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const uploadPhoto = async (req, res) => {
+  try {
+    const url = await uploadMenuPhoto(req.params.id, req.file);
+
+    res.status(201).json({
+      message: "Upload berhasil",
+      data: url,
+    });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const replacePhoto = async (req, res) => {
+  try {
+    const url = await replaceMenuPhoto(req.params.id, req.file);
+
+    res.json({
+      message: "Foto diganti",
+      data: url,
+    });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const deletePhoto = async (req, res) => {
+  try {
+    await deleteMenuPhoto(req.params.id);
+
+    res.json({
+      message: "Foto dihapus",
+    });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

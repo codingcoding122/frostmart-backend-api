@@ -20,7 +20,10 @@ export const updateMenu = async (id, data) => {
 };
 
 export const getMenuById = async (id) => {
-  const { rows } = await db.query("SELECT * FROM menus WHERE id=$1", [id]);
+  const { rows } = await db.query(
+    "SELECT * FROM menus WHERE id=$1 AND is_available=true",
+    [id],
+  );
   return rows[0];
 };
 
@@ -45,4 +48,22 @@ export const getMenus = async (page = 1, limit = 20) => {
 
 export const deleteMenu = async (id) => {
   await db.query("UPDATE menus SET is_deleted=true WHERE id=$1", [id]);
+};
+
+export const updateMenuImage = async (id, image_url, image_path) => {
+  await db.query(
+    `UPDATE menus 
+     SET image_url = $1, image_path = $2 
+     WHERE id = $3`,
+    [image_url, image_path, id],
+  );
+};
+
+export const removeMenuImage = async (id) => {
+  await db.query(
+    `UPDATE menus 
+     SET image_url = NULL, image_path = NULL 
+     WHERE id = $1`,
+    [id],
+  );
 };

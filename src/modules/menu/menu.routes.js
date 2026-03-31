@@ -2,10 +2,16 @@ import { Router } from "express";
 import * as menuController from "./menu.controller.js";
 import { authMiddleware } from "../../middleware/auth.middleware.js";
 import { authorizeRoles } from "../../middleware/authorizeRoles.js";
+import upload from "../../middleware/upload.middleware.js";
 
 const router = Router();
 
-// CREATE NEW MENU
+// FOTO (lebih spesifik dulu)
+router.post("/photo/:id", upload.single("image"), menuController.uploadPhoto);
+router.put("/photo/:id", upload.single("image"), menuController.replacePhoto);
+router.delete("/photo/:id", menuController.deletePhoto);
+
+// CREATE
 router.post(
   "/",
   authMiddleware,
@@ -13,7 +19,7 @@ router.post(
   menuController.createMenu,
 );
 
-// UPDATE MENU BY ID
+// UPDATE
 router.put(
   "/:id",
   authMiddleware,
@@ -21,12 +27,12 @@ router.put(
   menuController.updateMenu,
 );
 
-// GET ALL MENU PAGINATED
+// GET ALL
 router.get("/", menuController.getMenus);
 
-// GET MENU BY ID
 router.get("/:id", menuController.getMenuById);
 
+// DELETE
 router.delete(
   "/:id",
   authMiddleware,
