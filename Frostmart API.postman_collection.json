@@ -628,6 +628,736 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Users API",
+      "item": [
+        {
+          "name": "GET USERS (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function(){\r",
+                  "    pm.response.to.have.status(200)\r",
+                  "})\r",
+                  "\r",
+                  "const json = pm.response.json();\r",
+                  "pm.test(\"Users payload has data array\", function(){\r",
+                  "    pm.expect(json).to.have.property('data');\r",
+                  "    pm.expect(json.data).to.be.an('array');\r",
+                  "})\r",
+                  "\r",
+                  "if (json.data && json.data.length > 0) {\r",
+                  "    pm.environment.set('user_id', json.data[0].id);\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/users?page=1&limit=10&search=",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "search",
+                  "value": ""
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET USER BY ID (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function(){\r",
+                  "    pm.response.to.have.status(200)\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/users/{{user_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "users",
+                "{{user_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UPDATE USER ROLE (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function(){\r",
+                  "    pm.response.to.have.status(200)\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"role\": \"user\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/users/{{user_id}}/role",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "users",
+                "{{user_id}}",
+                "role"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Orders API",
+      "item": [
+        {
+          "name": "CHECKOUT (CREATE ORDER)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function(){\r",
+                  "    pm.response.to.have.status(201)\r",
+                  "})\r",
+                  "\r",
+                  "const json = pm.response.json();\r",
+                  "pm.test(\"Checkout response contains order and transaction\", function(){\r",
+                  "    pm.expect(json).to.have.property('order');\r",
+                  "    pm.expect(json).to.have.property('transaction');\r",
+                  "})\r",
+                  "\r",
+                  "if (json.order?.id) pm.environment.set('order_id', json.order.id);\r",
+                  "if (json.transaction?.id) pm.environment.set('transaction_id', json.transaction.id);"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"payment_method\": \"cash\",\r\n  \"items\": [\r\n    {\r\n      \"product_id\": {{product_id}},\r\n      \"quantity\": 1\r\n    }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/orders/checkout",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "orders",
+                "checkout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET MY ORDERS",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function(){\r",
+                  "    pm.response.to.have.status(200)\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/orders/my",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "orders",
+                "my"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET ORDER BY ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function(){\r",
+                  "    pm.response.to.have.status(200)\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/orders/{{order_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "orders",
+                "{{order_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET ALL ORDERS (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function(){\r",
+                  "    pm.response.to.have.status(200)\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/orders",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "orders"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UPDATE ORDER STATUS TO COMPLETED (SHOULD FAIL IF PAYMENT PENDING)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 400\", function(){\r",
+                  "    pm.response.to.have.status(400)\r",
+                  "})\r",
+                  "\r",
+                  "pm.test(\"Rule message exists\", function(){\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json).to.have.property('message');\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"status\": \"completed\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/orders/{{order_id}}/status",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "orders",
+                "{{order_id}}",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UPDATE ORDER STATUS TO COMPLETED (AFTER PAYMENT PAID)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function(){\r",
+                  "    pm.response.to.have.status(200)\r",
+                  "})\r",
+                  "\r",
+                  "pm.test(\"Order status is completed\", function(){\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.status).to.eql('completed');\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"status\": \"completed\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/orders/{{order_id}}/status",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "orders",
+                "{{order_id}}",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Transactions API",
+      "item": [
+        {
+          "name": "GET MY TRANSACTIONS",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function(){\r",
+                  "    pm.response.to.have.status(200)\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/transactions/my",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "transactions",
+                "my"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET TRANSACTION BY ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function(){\r",
+                  "    pm.response.to.have.status(200)\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/transactions/{{transaction_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "transactions",
+                "{{transaction_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET ALL TRANSACTIONS (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function(){\r",
+                  "    pm.response.to.have.status(200)\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/transactions",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "transactions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UPDATE TRANSACTION STATUS (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function(){\r",
+                  "    pm.response.to.have.status(200)\r",
+                  "})\r",
+                  "\r",
+                  "pm.test(\"Payment status is paid\", function(){\r",
+                  "    const json = pm.response.json();\r",
+                  "    pm.expect(json.payment_status).to.eql('paid');\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"payment_status\": \"paid\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/transactions/{{transaction_id}}/status",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "transactions",
+                "{{transaction_id}}",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Inventory Logs API",
+      "item": [
+        {
+          "name": "ADJUST INVENTORY (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function(){\r",
+                  "    pm.response.to.have.status(201)\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"product_id\": {{product_id}},\r\n  \"change_type\": \"IN\",\r\n  \"quantity\": 5,\r\n  \"description\": \"Restock for testing\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/inventory-logs/adjust",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "inventory-logs",
+                "adjust"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET INVENTORY LOGS (ADMIN)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function(){\r",
+                  "    pm.response.to.have.status(200)\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/inventory-logs?page=1&limit=20&product_id={{product_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "inventory-logs"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "product_id",
+                  "value": "{{product_id}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "event": [
@@ -673,6 +1403,18 @@
     },
     {
       "key": "product_id",
+      "value": ""
+    },
+    {
+      "key": "user_id",
+      "value": ""
+    },
+    {
+      "key": "order_id",
+      "value": ""
+    },
+    {
+      "key": "transaction_id",
       "value": ""
     },
     {

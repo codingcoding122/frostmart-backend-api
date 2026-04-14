@@ -2,10 +2,10 @@
 
 Base URL: {{base_url}}/api/products
 
-Dokumen ini menjelaskan endpoint Product utama yang aktif di backend Frostmart.
+Dokumen ini menjelaskan endpoint Product yang aktif di backend Frostmart.
 Semua endpoint write membutuhkan access token user dengan role admin.
 
-## 1. Ringkasan Endpoint
+## 1. Ringkasan Endpoint Product
 
 | Method | Endpoint | Akses | Keterangan |
 | --- | --- | --- | --- |
@@ -16,31 +16,31 @@ Semua endpoint write membutuhkan access token user dengan role admin.
 | DELETE | /api/products/:id | Admin | Delete product |
 
 Catatan:
-- Endpoint upload foto didokumentasikan di file terpisah: Dokumentasi API Upload Product Foto.md.
-- GET endpoint akan menambahkan field source dari cache middleware: db atau cache.
+- Endpoint upload foto ada di dokumentasi terpisah: Dokumentasi API Upload Product Foto.md.
+- GET endpoint menambahkan field source dari cache middleware: db atau cache.
 
 ## 2. Setup Postman
 
 Gunakan collection: Frostmart API.postman_collection.json
 
-Environment yang dipakai:
+Environment:
 - base_url: http://localhost:5000
-- url: http://localhost:5000/api (khusus collection Frostmart API)
-- access_token: diisi otomatis setelah signin atau isi manual
+- url: http://localhost:5000/api
+- access_token: diisi setelah signin
 - product_id: diisi dari response create/get
 
 ## 3. Auth untuk Endpoint Admin
 
-Endpoint admin membutuhkan header:
+Header endpoint admin:
 Authorization: Bearer <access_token>
 
 Jika belum punya token:
 1. POST /api/auth/local/signin
-2. Ambil access token dari cookie access_token atau dari variable Postman
+2. Ambil access token dari cookie atau environment variable
 
-Jika masih 403:
+Jika status 403:
 1. Pastikan role user = admin di tabel users
-2. Signin ulang agar claim role di JWT ter-update
+2. Signin ulang untuk refresh claim role di JWT
 
 ## 4. GET /api/products
 
@@ -52,7 +52,7 @@ Query params:
 Contoh:
 GET {{base_url}}/api/products?page=1&limit=10&search=nugget
 
-Response 200 (contoh cache miss):
+Response 200 (contoh):
 ```json
 {
   "source": "db",
@@ -189,7 +189,22 @@ Jika id tidak ada:
 }
 ```
 
-## 9. Error Reference
+## 9. Integrasi dengan Order dan Inventory
+
+Stok produk juga berubah melalui endpoint selain Product API:
+- POST /api/orders/checkout
+  - stok berkurang sesuai quantity order item
+  - inventory_log otomatis ditulis dengan change_type OUT
+- POST /api/inventory-logs/adjust
+  - stok bisa ditambah (IN) atau dikurangi (OUT)
+
+Aturan order status terkait payment:
+- `PATCH /api/orders/:id/status` ke `paid` atau `completed` akan ditolak jika payment status transaksi order tersebut belum `paid`.
+- Jalur yang benar: update payment status dulu via `PATCH /api/transactions/:id/status`, lalu update order status.
+
+Artinya, untuk verifikasi stok akhir, cek setelah operasi checkout/adjust juga, bukan hanya setelah PUT /api/products/:id.
+
+## 10. Error Reference
 
 - 200: sukses GET/PUT/DELETE
 - 201: sukses create
@@ -198,8 +213,8 @@ Jika id tidak ada:
 - 403: role tidak cukup (bukan admin)
 - 404: khusus GET by id saat item tidak ditemukan
 
-## 10. Catatan Penting
+## 11. Catatan Penting
 
-- Route aktif untuk product adalah /api/products, bukan /products.
+- Route aktif untuk product adalah /api/products.
 - Cache aktif di GET list dan GET by id dengan TTL 60 detik.
 - Data foto product tidak disimpan di kolom tabel products, tetapi di Redis key product:image:{id}.
