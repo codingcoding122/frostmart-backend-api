@@ -54,7 +54,11 @@ src/modules/
 npm install
 ```
 
-2. Buat file `.env` dari `.env.example`, lalu isi variabel.
+2. Konfigurasi Environment 
+
+```bash
+cp .env.example .env
+```
 
 3. Buat database dan jalankan schema:
 
