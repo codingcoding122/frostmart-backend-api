@@ -16,6 +16,7 @@ Semua endpoint write membutuhkan access token user dengan role admin.
 | DELETE | /api/products/:id | Admin | Delete product |
 
 Catatan:
+- Endpoint upload foto ada di dokumentasi terpisah: Dokumentasi API Upload Product Foto.md.
 - GET endpoint menambahkan field source dari cache middleware: db atau cache.
 
 ## 2. Setup Postman
