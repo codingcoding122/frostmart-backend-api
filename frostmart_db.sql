@@ -7,12 +7,6 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO users (name, email, password, role)
-VALUES 
-('Admin Frostmart', 'admin@gmail.com', '123456', 'admin'),
-('Norma', 'norma@gmail.com', '123456', 'user');
-
-SELECT * FROM users;
 
 CREATE TABLE products (
     id SERIAL PRIMARY KEY,
