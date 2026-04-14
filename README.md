@@ -184,6 +184,7 @@ npm run lint:fix
 
 ## Dokumentasi Detail
 
+- `Dokumentasi API Lengkap Frostmart.md`
 - `Dokumentasi Auth API.md`
 - `Dokumentasi API Product.md`
 - `Dokumentasi API Upload Product Foto.md`
