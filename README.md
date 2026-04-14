@@ -200,3 +200,4 @@ npm run lint:fix
 - Setelah ubah role user via SQL, login ulang agar claim role di JWT ikut update.
 - Cookie auth diset `secure: true`, jadi pada local HTTP ada kasus cookie tidak terkirim di client tertentu.
 - Order status `paid/completed` wajib didahului payment status `paid` agar status data konsisten.
+# frostmart-backend-api
