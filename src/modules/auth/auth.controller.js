@@ -40,7 +40,7 @@ export const refresh = async (req, res) => {
 
     setCookies(res, result);
 
-    res.json({ accessToken: result.accessToken });
+    res.json({ accessToken: result.accessToken, refreshToken: result.refreshToken });
   } catch (err) {
     res.status(403).json({ message: err.message });
   }
@@ -77,12 +77,7 @@ export const updateMe = async (req, res) => {
 // REMOVE SESSION (LOGOUT)
 export const removeSession = async (req, res) => {
   try {
-    const refreshToken =
-      req.cookies.refresh_token || req.headers["x-refresh-token"];
-
-    const all = req.query.all === "true"; // optional
-
-    await service.removeSession(refreshToken, req.user.id, all);
+    await service.removeSession();
 
     // clear cookies
     res.clearCookie("access_token");

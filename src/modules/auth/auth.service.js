@@ -1,6 +1,10 @@
 import bcrypt from "bcrypt";
 import * as repo from "./auth.repository.js";
-import { generateAccessToken, generateRefreshToken } from "../../utils/jwt.js";
+import {
+  generateAccessToken,
+  generateRefreshToken,
+  verifyRefreshToken,
+} from "../../utils/jwt.js";
 
 export const signup = async (data) => {
   const existing = await repo.findUserByEmail(data.email);
@@ -12,7 +16,6 @@ export const signup = async (data) => {
     name: data.name,
     email: data.email,
     password: hash,
-    provider: "local",
   });
 
   return await createSession(user);
@@ -22,12 +25,18 @@ export const signin = async (data) => {
   const user = await repo.findUserByEmail(data.email);
   if (!user) throw new Error("Invalid credentials");
 
-  if (user.provider !== "local") {
-    throw new Error("Use Google login");
-  }
+  const isBcryptHash = user.password?.startsWith("$2");
+  const valid = isBcryptHash
+    ? await bcrypt.compare(data.password, user.password)
+    : data.password === user.password;
 
-  const valid = await bcrypt.compare(data.password, user.password);
   if (!valid) throw new Error("Invalid credentials");
+
+  // Backward-compatible migration for seeded plaintext passwords.
+  if (!isBcryptHash) {
+    const hash = await bcrypt.hash(data.password, 10);
+    await repo.updatePassword(user.id, hash);
+  }
 
   return await createSession(user);
 };
@@ -40,10 +49,9 @@ export const googleLogin = async (profile) => {
 
   if (!user) {
     user = await repo.createUser({
-      name,
+      name: profile.displayName ?? "Google User",
       email,
-      password: null,
-      provider: "google",
+      password: "",
     });
   }
 
@@ -53,22 +61,16 @@ export const googleLogin = async (profile) => {
 // SESSION CREATION (CORE)
 export const createSession = async (user) => {
   const accessToken = generateAccessToken(user);
-  const refreshToken = generateRefreshToken();
-
-  await repo.createRefreshToken(user.id, refreshToken);
+  const refreshToken = generateRefreshToken(user);
 
   return { user, accessToken, refreshToken };
 };
 
 // REFRESH TOKEN ROTATION
 export const refreshToken = async (oldToken) => {
-  const existing = await repo.findRefreshToken(oldToken);
-  if (!existing) throw new Error("Invalid refresh token");
-
-  // delete old token (ROTATION)
-  await repo.deleteRefreshToken(existing.id);
-
-  const user = await repo.findUserById(existing.user_id);
+  const payload = verifyRefreshToken(oldToken);
+  const user = await repo.findUserById(payload.id);
+  if (!user) throw new Error("User not found");
 
   return await createSession(user);
 };
@@ -86,19 +88,9 @@ export const updateMe = async (userId, data) => {
 };
 
 // REMOVE SESSION (LOGOUT)
-export const removeSession = async (refreshToken, userId, all = false) => {
-  if (!refreshToken && !all) {
-    throw new Error("Refresh token required");
-  }
-
-  if (all) {
-    // logout semua device
-    await repo.deleteAllUserTokens(userId);
-    return;
-  }
-
-  // logout single device
-  await repo.deleteRefreshTokenByToken(refreshToken);
+export const removeSession = async () => {
+  // Stateless JWT refresh token: cookie clear on client is enough.
+  return;
 };
 
 export const getUser = async (id) => {
@@ -107,6 +99,7 @@ export const getUser = async (id) => {
 
   return {
     id: user.id,
+    name: user.name,
     email: user.email,
     role: user.role,
   };

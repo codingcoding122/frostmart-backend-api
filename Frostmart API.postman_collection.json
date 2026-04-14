@@ -1,0 +1,683 @@
+{
+  "info": {
+    "_postman_id": "03e4be3d-1291-4745-99f0-264a2ce7cd4f",
+    "name": "Frostmart API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "33041331",
+    "_collection_link": "https://go.postman.co/collection/33041331-03e4be3d-1291-4745-99f0-264a2ce7cd4f?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Auth API",
+      "item": [
+        {
+          "name": "ADMIN SIGNUP",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201 or 400\", function(){\r",
+                  "    pm.expect(pm.response.code).to.be.oneOf([201, 400])\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Frostmart Admin\",\r\n  \"email\": \"{{admin_email}}\",\r\n  \"password\": \"{{admin_password}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/auth/local/signup",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "auth",
+                "local",
+                "signup"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "ADMIN SIGNIN",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function(){\r",
+                  "    pm.response.to.have.status(200)\r",
+                  "})\r",
+                  "\r",
+                  "const setCookieHeaders = pm.response.headers.all().filter(h => h.key.toLowerCase() === 'set-cookie');\r",
+                  "const accessCookie = setCookieHeaders.find(h => h.value.startsWith('access_token='));\r",
+                  "\r",
+                  "pm.test(\"access_token cookie exists\", function(){\r",
+                  "    pm.expect(accessCookie).to.exist;\r",
+                  "})\r",
+                  "\r",
+                  "if (accessCookie) {\r",
+                  "    const token = accessCookie.value.match(/access_token=([^;]+)/)?.[1];\r",
+                  "    if (token) {\r",
+                  "        pm.environment.set('access_token', token);\r",
+                  "    }\r",
+                  "}"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"{{admin_email}}\",\r\n  \"password\": \"{{admin_password}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/auth/local/signin",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "auth",
+                "local",
+                "signin"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET MY PROFILE",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function(){\r",
+                  "    pm.response.to.have.status(200)\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/auth/user/me",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "auth",
+                "user",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "LOGOUT",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function(){\r",
+                  "    pm.response.to.have.status(200)\r",
+                  "})\r",
+                  "\r",
+                  "pm.test(\"Logout message is correct\", function(){\r",
+                  "    const json = pm.response.json()\r",
+                  "    pm.expect(json).to.have.property(\"message\")\r",
+                  "    pm.expect(json.message).to.eql(\"Logged out successfully\")\r",
+                  "})\r",
+                  "\r",
+                  "pm.environment.unset('access_token')"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/auth/remove-session",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "auth",
+                "remove-session"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Products API",
+      "item": [
+        {
+          "name": "CREATE NEW PRODUCT",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function(){\r",
+                  "    pm.response.to.have.status(201)\r",
+                  "})\r",
+                  "\r",
+                  "pm.test(\"Product created\", function(){\r",
+                  "    const json = pm.response.json()\r",
+                  "    pm.expect(json).to.have.property(\"id\")\r",
+                  "    pm.expect(json).to.have.property(\"name\")\r",
+                  "    pm.expect(json).to.have.property(\"description\")\r",
+                  "    pm.expect(json).to.have.property(\"price\")\r",
+                  "\r",
+                  "    pm.environment.set(\"product_id\", json.id)\r",
+                  "    console.log(json.id)\r",
+                  "})\r",
+                  "\r",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n    \"name\": \"Frozen Nugget Premium\",\r\n    \"description\": \"Nugget ayam beku premium\",\r\n    \"price\": 52000,\r\n    \"stock\": 120\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/products",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "products"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UPDATE PRODUCT",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"status code is 200\", function(){\r",
+                  "    pm.response.to.have.status(200)\r",
+                  "})\r",
+                  "\r",
+                  "pm.test(\"Product updated\", function(){\r",
+                  "    const json = pm.response.json()\r",
+                  "\r",
+                  "    pm.expect(json).to.have.property(\"id\")\r",
+                  "    pm.expect(json.name).to.eql(\"Updated Frozen Nugget\")\r",
+                  "    pm.expect(json.description).to.eql(\"Updated frozen product\")\r",
+                  "    pm.expect(json.stock).to.eql(110)\r",
+                  "\r",
+                  "    pm.environment.set(\"product_id\", json.id)\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Updated Frozen Nugget\",\r\n  \"description\": \"Updated frozen product\",\r\n  \"price\": 54000,\r\n  \"stock\": 110\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url}}/products/{{product_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "products",
+                "{{product_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET ALL DATA",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status is 200\", function(){\r",
+                  "    pm.response.to.have.status(200)\r",
+                  "})\r",
+                  "\r",
+                  "pm.test(\"response has pagination fields\", function(){\r",
+                  "    const json = pm.response.json()\r",
+                  "    pm.expect(json).to.have.property(\"page\")\r",
+                  "    pm.expect(json).to.have.property(\"limit\")\r",
+                  "    pm.expect(json).to.have.property(\"data\")\r",
+                  "})\r",
+                  "\r",
+                  "pm.test(\"data is an array\", function(){\r",
+                  "    const json = pm.response.json()\r",
+                  "\r",
+                  "    pm.expect(json.data).to.be.an(\"array\")\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/products?page=1&limit=20",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "products"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "GET PRODUCT BY ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function(){\r",
+                  "    pm.response.to.have.status(200)\r",
+                  "})\r",
+                  "\r",
+                  "pm.test(\"Product has correct structure\", function(){\r",
+                  "    const json = pm.response.json()\r",
+                  "    pm.expect(json).to.have.property(\"id\")\r",
+                  "    pm.expect(json).to.have.property(\"name\")\r",
+                  "    pm.expect(json).to.have.property(\"description\")\r",
+                  "    pm.expect(json).to.have.property(\"price\")\r",
+                  "\r",
+                  "    pm.environment.set(\"product_id\", json.id)\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url}}/products/{{product_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "products",
+                "{{product_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "UPLOAD PRODUCT PHOTO",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 201\", function(){\r",
+                  "    pm.response.to.have.status(201)\r",
+                  "})\r",
+                  "\r",
+                  "pm.test(\"Upload response structure\", function(){\r",
+                  "    const json = pm.response.json()\r",
+                  "    pm.expect(json).to.have.property(\"message\")\r",
+                  "    pm.expect(json).to.have.property(\"data\")\r",
+                  "    pm.expect(json.message).to.eql(\"Upload berhasil\")\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "{{image_path}}"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{url}}/products/photo/{{product_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "products",
+                "photo",
+                "{{product_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "REPLACE PRODUCT PHOTO",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function(){\r",
+                  "    pm.response.to.have.status(200)\r",
+                  "})\r",
+                  "\r",
+                  "pm.test(\"Replace response structure\", function(){\r",
+                  "    const json = pm.response.json()\r",
+                  "    pm.expect(json).to.have.property(\"message\")\r",
+                  "    pm.expect(json).to.have.property(\"data\")\r",
+                  "    pm.expect(json.message).to.eql(\"Foto diganti\")\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "{{image_path}}"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{url}}/products/photo/{{product_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "products",
+                "photo",
+                "{{product_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE PRODUCT PHOTO",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function(){\r",
+                  "    pm.response.to.have.status(200)\r",
+                  "})\r",
+                  "\r",
+                  "pm.test(\"Delete photo response\", function(){\r",
+                  "    const json = pm.response.json()\r",
+                  "    pm.expect(json).to.have.property(\"message\")\r",
+                  "    pm.expect(json.message).to.eql(\"Foto dihapus\")\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/products/photo/{{product_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "products",
+                "photo",
+                "{{product_id}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "DELETE PRODUCT",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Status code is 200\", function(){\r",
+                  "    pm.response.to.have.status(200)\r",
+                  "})\r",
+                  "\r",
+                  "pm.test(\"Delete message is correct\", function(){\r",
+                  "    const json = pm.response.json()\r",
+                  "\r",
+                  "    pm.expect(json).to.have.property(\"message\")\r",
+                  "    pm.expect(json.message).to.eql(\"Product deleted successfully\")\r",
+                  "})"
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{url}}/products/{{product_id}}",
+              "host": [
+                "{{url}}"
+              ],
+              "path": [
+                "products",
+                "{{product_id}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "url",
+      "value": ""
+    },
+    {
+      "key": "admin_email",
+      "value": "admin@frostmart.local"
+    },
+    {
+      "key": "admin_password",
+      "value": "Admin12345"
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    },
+    {
+      "key": "product_id",
+      "value": ""
+    },
+    {
+      "key": "image_path",
+      "value": ""
+    }
+  ]
+}

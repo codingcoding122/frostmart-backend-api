@@ -1,7 +1,7 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import bcrypt from "bcrypt";
-import db from "./db.config.js";
+import { db } from "./db.config.js";
 
 // LOCAL STRATEGY
 passport.use(
@@ -12,7 +12,7 @@ passport.use(
     },
     async (email, password, done) => {
       const user = await db.query(
-        "SELECT * FROM users WHERE email=$1 AND is_deleted=false",
+        "SELECT * FROM users WHERE email=$1",
         [email],
       );
 

@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import passport from "passport";
 import cors from "cors";
-import menuRoutes from "./modules/menu/menu.routes.js";
+import productRoutes from "./modules/product/product.routes.js";
 import authRoutes from "./modules/auth/auth.routes.js";
 import helmet from "helmet";
 import { xss } from "express-xss-sanitizer";
@@ -34,7 +34,7 @@ app.get("/", (req, res) => {
   res.send("Hello World!");
 });
 
-app.use("/api/menus", menuRoutes);
+app.use("/api/products", productRoutes);
 app.use("/api/auth", authRoutes);
 
 app.listen(port, () => {

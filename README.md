@@ -1,6 +1,5 @@
-# 🍽️ REST API — Auth & Menu
-
-REST API sederhana dengan autentikasi JWT, role-based authorization, dan manajemen menu. Dibangun dengan Express.js dan PostgreSQL.
+# 🍽️ REST API — Frostmart
+REST API sederhana dengan autentikasi JWT, role-based authorization, dan manajemen product. Dibangun dengan Express.js dan PostgreSQL.
 
 ## Tech Stack
 
@@ -21,7 +20,7 @@ REST API sederhana dengan autentikasi JWT, role-based authorization, dan manajem
 - Token disimpan di HTTP-only cookie
 - Role-based authorization (`user` / `admin`)
 - Multi-device logout
-- CRUD menu dengan soft delete & pagination
+- CRUD product dengan pagination & search
 - Request logging
 
 ---
@@ -39,7 +38,7 @@ src/
 │   └── logger.middleware.js
 ├── modules/
 │   ├── auth/               # Register, login, refresh, logout
-│   └── menu/               # CRUD menu
+│   └── product/            # CRUD product
 └── utils/
     ├── jwt.js              # Generate access & refresh token
     └── cookie.js           # Set cookie helper
@@ -127,17 +126,17 @@ Server berjalan di `http://localhost:5000`
 | `PUT`    | `/user/me`        | 🔒 Login | Update profil        |
 | `DELETE` | `/remove-session` | 🔒 Login | Logout               |
 
-### Menu — `/api/menus`
+### Product — `/api/products`
 
 | Method   | Endpoint | Akses    | Keterangan               |
 | -------- | -------- | -------- | ------------------------ |
-| `GET`    | `/`      | Public   | Semua menu (paginated)   |
-| `GET`    | `/:id`   | Public   | Detail menu              |
-| `POST`   | `/`      | 🔒 Admin | Buat menu baru           |
-| `PUT`    | `/:id`   | 🔒 Admin | Update menu              |
-| `DELETE` | `/:id`   | 🔒 Admin | Hapus menu (soft delete) |
+| `GET`    | `/`      | Public   | Semua product (paginated + search) |
+| `GET`    | `/:id`   | Public   | Detail product                      |
+| `POST`   | `/`      | 🔒 Admin | Buat product baru                   |
+| `PUT`    | `/:id`   | 🔒 Admin | Update product                      |
+| `DELETE` | `/:id`   | 🔒 Admin | Hapus product                       |
 
-> Dokumentasi lengkap tiap endpoint tersedia di [`DOKUMENTASI_API.md`](./DOKUMENTASI_API.md) dan [`DOKUMENTASI_MENU_API.md`](./DOKUMENTASI_MENU_API.md).
+> Dokumentasi lengkap tiap endpoint tersedia di [`Dokumentasi Auth API.md`](./Dokumentasi%20Auth%20API.md) dan [`Dokumentasi API Product.md`](./Dokumentasi%20API%20Product.md).
 
 ---
 
@@ -154,7 +153,7 @@ npm run lint:fix  # Auto-fix lint error
 
 ## Catatan
 
-- **Soft delete** — data menu/user tidak benar-benar dihapus, hanya di-flag `is_deleted = true`
+- **Delete product** — data product dihapus langsung dari tabel `products`
 - **Role admin** — set manual via SQL: `UPDATE users SET role='admin' WHERE email='...';`, lalu login ulang
 - **Cookie** — menggunakan `httpOnly`, `secure`, `sameSite: lax`; pastikan testing via HTTPS di production
 - **CORS** — saat ini hanya mengizinkan `http://localhost:5173`; ubah di `server.js` sesuai kebutuhan
