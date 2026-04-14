@@ -6,7 +6,7 @@ Backend REST API untuk Frostmart dengan autentikasi JWT, manajemen produk, check
 
 - Runtime: Node.js (ES Module)
 - Framework: Express.js
-- Database: PostgreSQL (`pg` Pool)
+- Database: PostgreSQL (`pg` Pool) Neontech
 - Auth: JWT, Bcrypt, Passport
 - Cache: Redis
 - Upload: Multer + Cloudinary
